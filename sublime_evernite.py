@@ -79,5 +79,4 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             print "  * ", notebook.name        
 
 
-        
-        
+    
