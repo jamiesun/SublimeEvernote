@@ -47,7 +47,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                        noteStoreUrl = authresult.noteStoreUrl
                        settings.set("authToken",token)  
                        settings.set("noteStoreUrl",noteStoreUrl) 
-                       settings.save('SublimeEvernote.sublime-settings')
+                       sublime.save_settings('SublimeEvernote.sublime-settings')
                        callback() 
                     else:
                         raise Exception("authenticate failure")
