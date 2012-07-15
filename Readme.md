@@ -1,12 +1,18 @@
 SublimeEvernote
 ===============
 
-[Sublime Text 2](http://www.sublimetext.com/2) plugin for create note to [Evernote](http://www.evernote.com) 
+[Sublime Text 2](http://www.sublimetext.com/2) plugin for [Evernote](http://www.evernote.com) 
 
 
 ### Install
 
 Through [Package Control](http://wbond.net/sublime_packages/package_control)
+
+`Command Palette` > `Package Control: Install Package` > `SublimeEvernote`
+
+or
+
+`Command Palette` > `Package Control: add Repository` && `input 'http://github.com/jamiesun/SublimeEvernote`
 
 `Command Palette` > `Package Control: Install Package` > `SublimeEvernote`
 
