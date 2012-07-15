@@ -1,5 +1,4 @@
 #coding:utf-8
-from __future__ import unicode_literals  
 import sys
 reload(sys)
 sys.path.append("lib")
@@ -60,10 +59,10 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             def on_tags(tags):
                 xh =  XHTML()
                 note = Types.Note()
-                note.title = title
+                note.title = title.encode('utf-8')
                 note.content = '<?xml version="1.0" encoding="UTF-8"?>'
                 note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
-                note.content += '<en-note><pre>%s'%xh.p(content)
+                note.content += '<en-note><pre>%s'%xh.p(content.encode('utf-8'))
                 note.content += '</pre></en-note>'
                 note.tagNames = tags and tags.split(",") or []
                 try:
