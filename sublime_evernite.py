@@ -55,9 +55,9 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             noteStore = NoteStore.Client(noteStoreProtocol)        
             region = sublime.Region(0L, self.view.size())
             content = self.view.substr(region)        
-            def on_title():
+            def on_title(title):
                 note = Types.Note()
-                note.title = "Test note from EDAMTest.py"   
+                note.title = title
                 note.content = '<?xml version="1.0" encoding="UTF-8"?>'
                 note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
                 note.content += '<en-note>%s'%content
@@ -66,9 +66,11 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 # Finally, send the new note to Evernote using the createNote method
                 # The new Note object that is returned will contain server-generated
                 # attributes such as the new note's unique GUID.
-                noteStore.createNote(authToken, note)      
-                sublime.message_dialog("send success")      
 
+                cnote = noteStore.createNote(authToken, note)   
+                sublime.message_dialog("send success %s"%cnote.guid)   
+
+                   
             self.window.show_input_panel("Title (required)::","",on_title,None,None) 
         except Exception,e:
             sublime.error_message("error:%s"%e)  
