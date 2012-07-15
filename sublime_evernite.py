@@ -7,9 +7,8 @@ import thrift.transport.THttpClient as THttpClient
 import evernote.edam.userstore.UserStore as UserStore
 import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
-
+from markupsafe import escape
 import sublime,sublime_plugin
-
 
 consumer_key = 'jamiesun-2467'
 consumer_secret ='7794453e92251986'
@@ -60,15 +59,17 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 note.title = title
                 note.content = '<?xml version="1.0" encoding="UTF-8"?>'
                 note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
-                note.content += '<en-note>%s'%content
-                note.content += '</en-note>'
-
+                note.content += '<en-note><pre>%s'%escape(content)
+                note.content += '</pre></en-note>'
+                
                 # Finally, send the new note to Evernote using the createNote method
                 # The new Note object that is returned will contain server-generated
                 # attributes such as the new note's unique GUID.
-
-                cnote = noteStore.createNote(authToken, note)   
-                sublime.message_dialog("send success %s"%cnote.guid)   
+                try:
+                    cnote = noteStore.createNote(authToken, note)   
+                    sublime.message_dialog("send success %s"%cnote.guid)   
+                except  Exception,e:
+                    sublime.error_message('error %s'%e)
 
                    
             self.window.show_input_panel("Title (required)::","",on_title,None,None) 
@@ -80,8 +81,3 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             self.connect(self.send_note)
         else:
             self.send_note()
- 
-
-
-        
-        
