@@ -54,6 +54,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             self.window.show_input_panel("password (required)::","",on_passwd,None,None) 
         self.window.show_input_panel("username (required)::","",on_username,None,None) 
 
+    @process_error
     def send_note(self):
         authToken = settings.get("authToken")
         noteStoreUrl = settings.get('noteStoreUrl')
