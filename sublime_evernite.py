@@ -1,7 +1,7 @@
 #coding:utf-8
+from __future__ import unicode_literals  
 import sys
 reload(sys)
-sys.setdefaultencoding('utf-8')
 sys.path.append("lib")
 
 import thrift.protocol.TBinaryProtocol as TBinaryProtocol
