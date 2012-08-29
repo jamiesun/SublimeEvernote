@@ -1,3 +1,10 @@
 [
-    { "command": "send_to_evernote", "caption": "Send to evernote" }       
+    { "command": "send_to_evernote", "caption": "Send to evernote" },    
+    {
+        "caption": "Evernote Settings",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/User/SublimeEvernote.sublime-settings"
+        }
+    }        
 ]

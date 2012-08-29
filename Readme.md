@@ -27,4 +27,6 @@ or clone this repository in
 
 `Command Palette` > `Send to evernote`
 
-`Context menu` > `Send to evernote`
+`Context menu` > `Send to Evernote`
+
+`Context menu` > `Evernote settings`
