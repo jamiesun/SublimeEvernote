@@ -68,7 +68,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
     def send_note(self,**kwargs):
         expiration = settings.get("expiration") 
         lasttime = datetime.datetime.utcfromtimestamp(Decimal(str(expiration))/1000)
-        comp =  (lasttime - datetime.datetime.now()).seconds
+        comp =  (lasttime - datetime.datetime.utcnow()).seconds
         if comp < 1 :
             if not sublime.ok_cancel_dialog("token has expire,now to authenticate,continue?"):
                 return
