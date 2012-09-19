@@ -37,7 +37,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 authresult = userStore.authenticate(username,password,consumer_key,consumer_secret) 
                 if authresult:
                    token = authresult.authenticationToken
-                   expiration = authresult.expiration
+                   expiration = str(authresult.expiration)
                    noteStoreUrl = authresult.noteStoreUrl
                    settings.set("username",username)  
                    settings.set("password",password)  
