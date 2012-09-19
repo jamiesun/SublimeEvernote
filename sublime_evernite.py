@@ -10,8 +10,10 @@ import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
 import evernote.edam.error.ttypes as Errors
 from html import XHTML
+from decimal import Decimal
 import sublime,sublime_plugin
 import datetime
+
 
 consumer_key = 'jamiesun-2467'
 consumer_secret ='7794453e92251986'
@@ -65,7 +67,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
 
     def send_note(self,**kwargs):
         expiration = settings.get("expiration") 
-        lasttime = datetime.datetime.fromtimestamp(expiration/1000)
+        lasttime = datetime.datetime.utcfromtimestamp(Decimal(str(expiration))/1000)
         comp =  (lasttime - datetime.datetime.now()).seconds
         if comp < 1 :
             if not sublime.ok_cancel_dialog("token has expire,now to authenticate,continue?"):
