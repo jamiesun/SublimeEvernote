@@ -2,7 +2,6 @@
 import sys
 reload(sys)
 sys.path.append("lib")
-
 import thrift.protocol.TBinaryProtocol as TBinaryProtocol
 import thrift.transport.THttpClient as THttpClient
 import evernote.edam.userstore.UserStore as UserStore
@@ -10,9 +9,7 @@ import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
 import evernote.edam.error.ttypes as Errors
 from html import XHTML
-from decimal import Decimal
 import sublime,sublime_plugin
-import datetime
 
 
 consumer_key = 'jamiesun-2467'
@@ -37,11 +34,10 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 authresult = userStore.authenticate(username,password,consumer_key,consumer_secret) 
                 if authresult:
                    token = authresult.authenticationToken
-                   expiration = str(authresult.expiration)
                    noteStoreUrl = authresult.noteStoreUrl
-                   settings.set("username",username)  
-                   settings.set("password",password)  
-                   settings.set("expiration",expiration)  
+                   if not settings.get("password") and sublime.ok_cancel_dialog("Remember password?"):
+                       settings.set("password",password)  
+                   settings.set("username",username)
                    settings.set("authToken",token)  
                    settings.set("noteStoreUrl",noteStoreUrl) 
                    sublime.save_settings('SublimeEvernote.sublime-settings')
@@ -66,16 +62,6 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             _connect(iusername,ipassword)        
 
     def send_note(self,**kwargs):
-        expiration = settings.get("expiration") 
-        lasttime = datetime.datetime.utcfromtimestamp(Decimal(str(expiration))/1000)
-        comp =  (lasttime - datetime.datetime.utcnow()).seconds
-        if comp < 1 :
-            if not sublime.ok_cancel_dialog("token has expire,now to authenticate,continue?"):
-                return
-            else:
-                self.connect(self.send_note)
-                return
-
         authToken = settings.get("authToken")
         noteStoreUrl = settings.get('noteStoreUrl')
         noteStoreHttpClient = THttpClient.THttpClient(noteStoreUrl)
@@ -99,11 +85,12 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 sublime.status_message("send success guid:%s"%cnote.guid)  
                 sublime.message_dialog("success") 
             except Errors.EDAMUserException,e:
+                args = dict(title=title,tags=tags)
                 if e.errorCode == 9:
-                    args = dict(title=title,tags=tags)
                     self.connect(self.send_note,**args)
                 else:
-                    sublime.error_message('error %s'%e)
+                    if sublime.ok_cancel_dialog('error %s! retry?'%e):
+                        self.connect(self.send_note,**args)
             except  Exception,e:
                 sublime.error_message('error %s'%e)
 
