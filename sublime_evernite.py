@@ -1,6 +1,5 @@
 #coding:utf-8
 import sys
-reload(sys)
 sys.path.append("lib")
 
 import thrift.protocol.TBinaryProtocol as TBinaryProtocol
