@@ -9,12 +9,17 @@ import evernote.edam.type.ttypes as Types
 import evernote.edam.error.ttypes as Errors
 from html import XHTML
 import sublime,sublime_plugin
+import oauth2 as oauth
+import urllib
+import urlparse
 
-
-consumer_key = 'jamiesun-2467'
-consumer_secret ='7794453e92251986'
-evernoteHost = "www.evernote.com"
+consumer_key = 'oparrish-4096'
+consumer_secret ='c112c6417738f06a'
+evernoteHost = "sandbox.evernote.com"
 userStoreUri = "https://" + evernoteHost + "/edam/user"
+temp_credential_request_uri = "https://" + evernoteHost + "/oauth"
+resource_owner_authorization_uri = "https://" + evernoteHost + "/OAuth.action"
+token_request_uri = "https://" + evernoteHost + "/oauth"
 
 settings = sublime.load_settings("SublimeEvernote.sublime-settings")
 
@@ -25,25 +30,10 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
 
     def connect(self,callback,**kwargs):
         sublime.status_message("authenticate..., please wait...")   
-        def _connect(username,password):
+        
+        def _connect(authToken):
             try:
-                userStoreHttpClient = THttpClient.THttpClient(userStoreUri)
-                userStoreProtocol = TBinaryProtocol.TBinaryProtocol(userStoreHttpClient)
-                userStore = UserStore.Client(userStoreProtocol)
-                authresult = userStore.authenticate(username,password,consumer_key,consumer_secret) 
-                if authresult:
-                   token = authresult.authenticationToken
-                   noteStoreUrl = authresult.noteStoreUrl
-                   if not settings.get("password") and sublime.ok_cancel_dialog("Remember password?"):
-                       settings.set("password",password)  
-                   settings.set("username",username)
-                   settings.set("authToken",token)  
-                   settings.set("noteStoreUrl",noteStoreUrl) 
-                   sublime.save_settings('SublimeEvernote.sublime-settings')
-                   sublime.status_message("authenticate ok")   
-                   callback(**kwargs)
-                else:
-                    raise Exception("authenticate failure")
+                callback(**kwargs)
             except Exception,e:
                 sublime.error_message("error:%s"%e)  
 
@@ -53,16 +43,62 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                     _connect(username,password)
             self.window.show_input_panel("password (required)::","",on_passwd,None,None) 
 
-        iusername = settings.get("username")
-        ipassword = settings.get("password")
-        if not iusername or not ipassword:
-            self.window.show_input_panel("username (required)::","",on_username,None,None) 
+        def on_verifier(verifier):
+            if verifier:
+                token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret']) 
+                token.set_verifier(verifier)
+                            
+                client = oauth.Client(consumer, token)
+                resp, content = client.request(token_request_uri, "POST")
+                
+                access_token = dict(urlparse.parse_qsl(content))
+                
+                if access_token:
+                   settings.set("oauth_token",access_token['oauth_token']) 
+                   settings.set("noteStoreUrl",access_token['edam_noteStoreUrl'])
+                   sublime.save_settings('SublimeEvernote.sublime-settings') 
+                   sublime.status_message("authenticate ok")
+                   _connect(access_token['oauth_token'])
+                else:
+                    raise Exception("authenticate failure")
+            else:
+                self.window.show_input_panel("Paste the verifier string from from the URL here.  Verifier (required):","",on_verifier,None,None)
+
+        i_auth_token = settings.get("oauth_token")
+        i_note_store_url = settings.get("noteStoreUrl")
+        
+        consumer = None
+        request_token = None
+        
+        if not i_auth_token or not i_note_store_url:
+            consumer = oauth.Consumer(key=consumer_key , secret=consumer_secret)
+            client = oauth.Client(consumer)
+
+            # Make the request for the temporary credentials (Request Token)
+            callback_url = 'http://127.0.0.1'
+            request_url = '%s?oauth_callback=%s' % (temp_credential_request_uri,
+                urllib.quote(callback_url))
+
+            resp, content = client.request(request_url, "GET")
+            print content
+            if resp['status'] != '200':
+                raise Exception("Invalid response %s." % resp['status'])
+
+            request_token = dict(urlparse.parse_qsl(content))
+
+            authorization_url = '%s?oauth_token=%s' % (resource_owner_authorization_uri, request_token['oauth_token'])
+
+            def on_authorization_url(authorization_url):
+                self.window.show_input_panel("Paste the verifier string from from the URL here.  Verifier (required):","",on_verifier,None,None)
+
+            self.window.show_input_panel("Cut and paste this URL into a browswer to authorize SublimeEvernote to access your Evernote account ->",authorization_url,on_authorization_url,None,None) 
         else:
-            _connect(iusername,ipassword)        
+            self.send_note(**kwargs)        
 
     def send_note(self,**kwargs):
-        authToken = settings.get("authToken")
+        authToken = settings.get("oauth_token")
         noteStoreUrl = settings.get('noteStoreUrl')
+
         noteStoreHttpClient = THttpClient.THttpClient(noteStoreUrl)
         noteStoreProtocol = TBinaryProtocol.TBinaryProtocol(noteStoreHttpClient)
         noteStore = NoteStore.Client(noteStoreProtocol)        
@@ -104,7 +140,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             sendnote(kwargs.get("title"),kwargs.get("tags")) 
 
     def run(self, edit):
-        if not settings.get("authToken"):
+        if not settings.get("oauth_token") and not settings.get("noteStoreUrl"):
             self.connect(self.send_note)
         else:
             self.send_note()
