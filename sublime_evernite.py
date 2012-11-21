@@ -15,7 +15,7 @@ import urlparse
 
 consumer_key = 'oparrish-4096'
 consumer_secret ='c112c6417738f06a'
-evernoteHost = "sandbox.evernote.com"
+evernoteHost = "www.evernote.com"
 userStoreUri = "https://" + evernoteHost + "/edam/user"
 temp_credential_request_uri = "https://" + evernoteHost + "/oauth"
 resource_owner_authorization_uri = "https://" + evernoteHost + "/OAuth.action"
@@ -91,7 +91,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             def on_authorization_url(authorization_url):
                 self.window.show_input_panel("Paste the verifier string from from the URL here.  Verifier (required):","",on_verifier,None,None)
 
-            self.window.show_input_panel("Cut and paste this URL into a browswer to authorize SublimeEvernote to access your Evernote account ->",authorization_url,on_authorization_url,None,None) 
+            self.window.show_input_panel("Cut and paste this URL into a browswer to authorize SublimeEvernote to access your Evernote account.  After authorizing, press enter.",authorization_url,on_authorization_url,None,None) 
         else:
             self.send_note(**kwargs)        
 
