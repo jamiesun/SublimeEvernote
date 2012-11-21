@@ -37,12 +37,6 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             except Exception,e:
                 sublime.error_message("error:%s"%e)  
 
-        def on_username(username):
-            def on_passwd(password):
-                if  username and  password:
-                    _connect(username,password)
-            self.window.show_input_panel("password (required)::","",on_passwd,None,None) 
-
         def on_verifier(verifier):
             if verifier:
                 token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret']) 
