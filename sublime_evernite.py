@@ -38,7 +38,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             encoding = 'windows-1252'
         contents = self.view.substr(region)
 
-        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly'])
+        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly', 'metadata'])
 
         return markdown_html
 
@@ -113,13 +113,15 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         region = sublime.Region(0L, self.view.size())
         content = self.view.substr(region)  
 
+        markdown_html = self.to_markdown_html()
+
         def sendnote(title,tags):
             xh =  XHTML()
             note = Types.Note()
             note.title = title.encode('utf-8')
             note.content = '<?xml version="1.0" encoding="UTF-8"?>'
             note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
-            note.content += '<en-note>%s'%self.to_markdown_html().encode('utf-8')
+            note.content += '<en-note>%s'%markdown_html.encode('utf-8')
             note.content += '</en-note>'
             note.tagNames = tags and tags.split(",") or []
             try:
@@ -140,11 +142,16 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         def on_title(title):
             def on_tags(tags):
                 sendnote(title,tags)
-            self.window.show_input_panel("Tags (Optional)::","",on_tags,None,None) 
+            if not 'tags' in markdown_html.metadata:
+                self.window.show_input_panel("Tags (Optional)::","",on_tags,None,None) 
+            else:
+                sendnote(title, markdown_html.metadata['tags'])
 
-        if not  kwargs.get("title"):
+        if not(kwargs.get("title") or 'title' in markdown_html.metadata):
             self.window.show_input_panel("Title (required)::","",on_title,None,None)
-        else:
+        elif not kwargs.get("tags"):
+            on_title(markdown_html.metadata['title'])
+        else:    
             sendnote(kwargs.get("title"),kwargs.get("tags")) 
 
     def run(self, edit):
