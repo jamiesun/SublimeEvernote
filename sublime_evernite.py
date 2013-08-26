@@ -12,6 +12,7 @@ import sublime,sublime_plugin
 import oauth2 as oauth
 import urllib
 import urlparse
+import markdown2
 
 consumer_key = 'oparrish-4096'
 consumer_secret ='c112c6417738f06a'
@@ -27,6 +28,19 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
     def __init__(self,view):
         self.view = view    
         self.window = sublime.active_window()
+
+    def to_markdown_html(self):
+        region = sublime.Region(0, self.view.size())
+        encoding = self.view.encoding()
+        if encoding == 'Undefined':
+            encoding = 'utf-8'
+        elif encoding == 'Western (Windows 1252)':
+            encoding = 'windows-1252'
+        contents = self.view.substr(region)
+
+        markdown_html = markdown2.markdown(contents, extras=['footnotes', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly', 'metadata'])
+
+        return markdown_html
 
     def connect(self,callback,**kwargs):
         sublime.status_message("authenticate..., please wait...")   
@@ -99,14 +113,16 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         region = sublime.Region(0L, self.view.size())
         content = self.view.substr(region)  
 
+        markdown_html = self.to_markdown_html()
+
         def sendnote(title,tags):
             xh =  XHTML()
             note = Types.Note()
             note.title = title.encode('utf-8')
             note.content = '<?xml version="1.0" encoding="UTF-8"?>'
             note.content += '<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd">'
-            note.content += '<en-note><pre>%s'%xh.p(content.encode('utf-8'))
-            note.content += '</pre></en-note>'
+            note.content += '<en-note>%s'%markdown_html.encode('utf-8')
+            note.content += '</en-note>'
             note.tagNames = tags and tags.split(",") or []
             try:
                 sublime.status_message("please wait...")   
@@ -126,11 +142,16 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         def on_title(title):
             def on_tags(tags):
                 sendnote(title,tags)
-            self.window.show_input_panel("Tags (Optional)::","",on_tags,None,None) 
+            if not 'tags' in markdown_html.metadata:
+                self.window.show_input_panel("Tags (Optional)::","",on_tags,None,None) 
+            else:
+                sendnote(title, markdown_html.metadata['tags'])
 
-        if not  kwargs.get("title"):
+        if not(kwargs.get("title") or 'title' in markdown_html.metadata):
             self.window.show_input_panel("Title (required)::","",on_title,None,None)
-        else:
+        elif not kwargs.get("tags"):
+            on_title(markdown_html.metadata['title'])
+        else:    
             sendnote(kwargs.get("title"),kwargs.get("tags")) 
 
     def run(self, edit):
