@@ -41,6 +41,28 @@ This:
 Turns into this:
 ![this](https://dl.dropbox.com/u/643062/SublimeEvernoteScreenshots/Evernote.png)
 
+#### Authenticating with Evernote ####
+
+In order to send notes you need to authenticate and allow the plugin permissions via Evernote's oauth. 
+This is a bit of a manual process now as there are no callbacks to Sublime to handle this process automatically.
+Here are a collection of screenshots to step you through the process.
+
+##### Step 1 - Copy oauth link to your browser:
+![copy oauth](https://raw.github.com/dencold/static/master/images/sublimeevernote/1-copy_link.png)
+
+##### Step 2 - Authorize plugin with Evernote:
+![authorize](https://raw.github.com/dencold/static/master/images/sublimeevernote/2_authorize.png)
+
+##### Step 3 - Copy oauth verifier
+![redirect](https://raw.github.com/dencold/static/master/images/sublimeevernote/3_redirect.png)
+![verifier](https://raw.github.com/dencold/static/master/images/sublimeevernote/4_oauth_verifier.png)
+
+##### Step 4 - Verify token on Sublime
+![redirect](https://raw.github.com/dencold/static/master/images/sublimeevernote/5_verify_sublime.png)
+
+##### Step 5 - Rejoice!
+![redirect](https://raw.github.com/dencold/static/master/images/sublimeevernote/6_rejoice.png)
+
 #### Metadata ####
 
 Use metadata block to specify title and tags.
