@@ -48,7 +48,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         def _connect(authToken):
             try:
                 callback(**kwargs)
-            except Exception,e:
+            except Exception as e:
                 sublime.error_message("error:%s"%e)  
 
         def on_verifier(verifier):
@@ -129,14 +129,14 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
                 cnote = noteStore.createNote(authToken, note)   
                 sublime.status_message("send success guid:%s"%cnote.guid)  
                 sublime.message_dialog("success") 
-            except Errors.EDAMUserException,e:
+            except Errors.EDAMUserException as e:
                 args = dict(title=title,tags=tags)
                 if e.errorCode == 9:
                     self.connect(self.send_note,**args)
                 else:
                     if sublime.ok_cancel_dialog('error %s! retry?'%e):
                         self.connect(self.send_note,**args)
-            except  Exception,e:
+            except  Exception as e:
                 sublime.error_message('error %s'%e)
 
         def on_title(title):
