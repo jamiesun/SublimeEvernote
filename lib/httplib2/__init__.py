@@ -33,7 +33,17 @@ import email.FeedParser
 import StringIO
 import gzip
 import zlib
+
+# Force loading of SSL-enabled httplib
+import imp
+import os
+import sublime
+lib_folder = os.path.join(sublime.packages_path(), 'SublimeEvernote', 'lib')
+m_info = imp.find_module('httplib', [lib_folder])
+m = imp.load_module('httplib', *m_info)
 import httplib
+print httplib.__file__
+
 import urlparse
 import urllib
 import base64
