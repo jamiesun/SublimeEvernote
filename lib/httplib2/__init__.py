@@ -34,13 +34,14 @@ import StringIO
 import gzip
 import zlib
 
-# Force loading of SSL-enabled httplib
-import imp
-import os
+# Force loading of SSL-enabled httplib for Linux users
 import sublime
-lib_folder = os.path.join(sublime.packages_path(), 'SublimeEvernote', 'lib')
-m_info = imp.find_module('httplib', [lib_folder])
-m = imp.load_module('httplib', *m_info)
+if sublime.platform() == 'linux':
+  import imp
+  import os
+  lib_folder = os.path.join(sublime.packages_path(), 'SublimeEvernote', 'lib')
+  m_info = imp.find_module('httplib', [lib_folder])
+  m = imp.load_module('httplib', *m_info)
 import httplib
 
 import urlparse
