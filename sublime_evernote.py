@@ -43,11 +43,12 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
 
         sels = self.view.sel()
         contents = ''
-        if not sels:
-            region = sublime.Region(0L, self.view.size())
-            contents = self.view.substr(region)  
-        else:
+        if sels:
             for sel in sels: contents += self.view.substr(sel) + '\n\n'   
+
+        if not contents.strip():
+            region = sublime.Region(0L, self.view.size())
+            contents = self.view.substr(region) 
 
         markdown_html = markdown2.markdown(contents, extras=['footnotes', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly', 'metadata'])
         return markdown_html
