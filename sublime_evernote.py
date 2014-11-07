@@ -40,6 +40,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         elif encoding == 'Western (Windows 1252)':
             encoding = 'windows-1252'
 
+
         sels = self.view.sel()
         contents = ''
         if not sels:
