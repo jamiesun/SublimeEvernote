@@ -48,7 +48,7 @@ This is a bit of a manual process now as there are no callbacks to Sublime to ha
 Here are a collection of screenshots to step you through the process.
 
 ##### Step 1 - Sublime text2 open your browser,you need login:
-![login]()
+![login](https://raw.githubusercontent.com/jamiesun/SublimeEvernote/master/snapshot/login.png)
 
 ##### Step 2 - Authorize plugin with Evernote:
 ![authorize](https://raw.github.com/dencold/static/master/images/sublimeevernote/2_authorize.png)

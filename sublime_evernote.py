@@ -50,10 +50,8 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         sublime.status_message("authenticate..., please wait...")   
         client = get_evernote_client()    
         request_token = client.get_request_token(callbackUrl)
-        print request_token
 
         def on_verifier(verifier):
-            print verifier
             access_token =  client.get_access_token(request_token['oauth_token'],request_token['oauth_token_secret'],verifier)
             settings.set('access_token',access_token)
             sublime.save_settings('SublimeEvernote.sublime-settings') 
@@ -65,7 +63,6 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
 
     def send_note(self,**kwargs):
         access_token = settings.get('access_token')
-        print access_token
         client,noteStore = None,None
         if access_token :
             client = get_evernote_client(token=access_token)    
