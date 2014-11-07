@@ -47,8 +47,8 @@ In order to send notes you need to authenticate and allow the plugin permissions
 This is a bit of a manual process now as there are no callbacks to Sublime to handle this process automatically.
 Here are a collection of screenshots to step you through the process.
 
-##### Step 1 - Copy oauth link to your browser:
-![copy oauth](https://raw.github.com/dencold/static/master/images/sublimeevernote/1-copy_link.png)
+##### Step 1 - Sublime text2 open your browser,you need login:
+![login]()
 
 ##### Step 2 - Authorize plugin with Evernote:
 ![authorize](https://raw.github.com/dencold/static/master/images/sublimeevernote/2_authorize.png)
