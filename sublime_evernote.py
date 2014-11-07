@@ -1,28 +1,32 @@
 #coding:utf-8
 import sys
-sys.path.append("lib")
-import thrift.protocol.TBinaryProtocol as TBinaryProtocol
-import thrift.transport.THttpClient as THttpClient
+sys.path.insert(0,"lib")
 import evernote.edam.userstore.UserStore as UserStore
 import evernote.edam.notestore.NoteStore as NoteStore
 import evernote.edam.type.ttypes as Types
 import evernote.edam.error.ttypes as Errors
-from html import XHTML
+from evernote.api.client import EvernoteClient
 import sublime,sublime_plugin
-import oauth2 as oauth
-import urllib
-import urlparse
 import markdown2
+import webbrowser
 
 consumer_key = 'oparrish-4096'
 consumer_secret ='c112c6417738f06a'
 evernoteHost = "www.evernote.com"
-userStoreUri = "https://" + evernoteHost + "/edam/user"
-temp_credential_request_uri = "https://" + evernoteHost + "/oauth"
-resource_owner_authorization_uri = "https://" + evernoteHost + "/OAuth.action"
-token_request_uri = "https://" + evernoteHost + "/oauth"
-
+callbackUrl = "http://127.0.0.1/sublimeevernote/callback"
 settings = sublime.load_settings("SublimeEvernote.sublime-settings")
+
+
+def get_evernote_client(token=None):
+    if token:
+        return EvernoteClient(token=token,service_host=evernoteHost, sandbox=False)
+    else:
+        return EvernoteClient(
+            consumer_key=consumer_key,
+            consumer_secret=consumer_secret,
+            service_host=evernoteHost, 
+            sandbox=False
+        )    
 
 class SendToEvernoteCommand(sublime_plugin.TextCommand):
     def __init__(self,view):
@@ -44,79 +48,42 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
 
     def connect(self,callback,**kwargs):
         sublime.status_message("authenticate..., please wait...")   
-        
-        def _connect(authToken):
-            try:
-                callback(**kwargs)
-            except Exception as e:
-                sublime.error_message("error:%s"%e)  
+        client = get_evernote_client()    
+        request_token = client.get_request_token(callbackUrl)
+        print request_token
 
         def on_verifier(verifier):
-            if verifier:
-                token = oauth.Token(request_token['oauth_token'],request_token['oauth_token_secret']) 
-                token.set_verifier(verifier)
-                            
-                client = oauth.Client(consumer, token)
-                resp, content = client.request(token_request_uri, "POST")
-                
-                access_token = dict(urlparse.parse_qsl(content))
-                
-                if access_token:
-                   settings.set("oauth_token",access_token['oauth_token']) 
-                   settings.set("noteStoreUrl",access_token['edam_noteStoreUrl'])
-                   sublime.save_settings('SublimeEvernote.sublime-settings') 
-                   sublime.status_message("authenticate ok")
-                   _connect(access_token['oauth_token'])
-                else:
-                    raise Exception("authenticate failure")
-            else:
-                self.window.show_input_panel("Paste the verifier string from from the URL here.  Verifier (required):","",on_verifier,None,None)
+            print verifier
+            access_token =  client.get_access_token(request_token['oauth_token'],request_token['oauth_token_secret'],verifier)
+            settings.set('access_token',access_token)
+            sublime.save_settings('SublimeEvernote.sublime-settings') 
+            sublime.status_message("authenticate ok")
+            callback(**kwargs)
 
-        i_auth_token = settings.get("oauth_token")
-        i_note_store_url = settings.get("noteStoreUrl")
-        
-        consumer = None
-        request_token = None
-        
-        if not i_auth_token or not i_note_store_url:
-            consumer = oauth.Consumer(key=consumer_key , secret=consumer_secret)
-            client = oauth.Client(consumer)
-
-            # Make the request for the temporary credentials (Request Token)
-            callback_url = 'http://127.0.0.1'
-            request_url = '%s?oauth_callback=%s' % (temp_credential_request_uri,
-                urllib.quote(callback_url))
-
-            resp, content = client.request(request_url, "GET")
-            print content
-            if resp['status'] != '200':
-                raise Exception("Invalid response %s." % resp['status'])
-
-            request_token = dict(urlparse.parse_qsl(content))
-
-            authorization_url = '%s?oauth_token=%s' % (resource_owner_authorization_uri, request_token['oauth_token'])
-
-            def on_authorization_url(authorization_url):
-                self.window.show_input_panel("Paste the verifier string from from the URL here.  Verifier (required):","",on_verifier,None,None)
-
-            self.window.show_input_panel("Cut and paste this URL into a browswer to authorize SublimeEvernote to access your Evernote account.  After authorizing, press enter.",authorization_url,on_authorization_url,None,None) 
-        else:
-            self.send_note(**kwargs)        
+        webbrowser.open(client.get_authorize_url(request_token))
+        self.window.show_input_panel("type Verifier (required):",'',on_verifier,None,None) 
 
     def send_note(self,**kwargs):
-        authToken = settings.get("oauth_token")
-        noteStoreUrl = settings.get('noteStoreUrl')
+        access_token = settings.get('access_token')
+        print access_token
+        client,noteStore = None,None
+        if access_token :
+            client = get_evernote_client(token=access_token)    
+        else:
+            return self.connect(self.send_note,**kwargs)
+            
+        try:
+            noteStore = client.get_note_store()     
+        except Exception as e:
+            if sublime.ok_cancel_dialog('error %s! retry?'%e):
+                self.connect(self.send_note,**kwargs)
 
-        noteStoreHttpClient = THttpClient.THttpClient(noteStoreUrl)
-        noteStoreProtocol = TBinaryProtocol.TBinaryProtocol(noteStoreHttpClient)
-        noteStore = NoteStore.Client(noteStoreProtocol)        
         region = sublime.Region(0L, self.view.size())
         content = self.view.substr(region)  
 
         markdown_html = self.to_markdown_html()
 
         def sendnote(title,tags):
-            xh =  XHTML()
             note = Types.Note()
             note.title = title.encode('utf-8')
             note.content = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -126,7 +93,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             note.tagNames = tags and tags.split(",") or []
             try:
                 sublime.status_message("please wait...")   
-                cnote = noteStore.createNote(authToken, note)   
+                cnote = noteStore.createNote(access_token, note)   
                 sublime.status_message("send success guid:%s"%cnote.guid)  
                 sublime.message_dialog("success") 
             except Errors.EDAMUserException as e:
@@ -155,7 +122,7 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
             sendnote(kwargs.get("title"),kwargs.get("tags")) 
 
     def run(self, edit):
-        if not settings.get("oauth_token") and not settings.get("noteStoreUrl"):
+        if not settings.get("access_token"):
             self.connect(self.send_note)
         else:
             self.send_note()
