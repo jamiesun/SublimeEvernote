@@ -34,16 +34,21 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         self.window = sublime.active_window()
 
     def to_markdown_html(self):
-        region = sublime.Region(0, self.view.size())
         encoding = self.view.encoding()
         if encoding == 'Undefined':
             encoding = 'utf-8'
         elif encoding == 'Western (Windows 1252)':
             encoding = 'windows-1252'
-        contents = self.view.substr(region)
+
+        sels = self.view.sel()
+        contents = ''
+        if not sels:
+            region = sublime.Region(0L, self.view.size())
+            contents = self.view.substr(region)  
+        else:
+            for sel in sels: contents += self.view.substr(sel) + '\n\n'   
 
         markdown_html = markdown2.markdown(contents, extras=['footnotes', 'fenced-code-blocks', 'cuddled-lists', 'code-friendly', 'metadata'])
-
         return markdown_html
 
     def connect(self,callback,**kwargs):
@@ -74,9 +79,6 @@ class SendToEvernoteCommand(sublime_plugin.TextCommand):
         except Exception as e:
             if sublime.ok_cancel_dialog('error %s! retry?'%e):
                 self.connect(self.send_note,**kwargs)
-
-        region = sublime.Region(0L, self.view.size())
-        content = self.view.substr(region)  
 
         markdown_html = self.to_markdown_html()
 
