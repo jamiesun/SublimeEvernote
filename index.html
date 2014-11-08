@@ -1,53 +1,62 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="SublimeEvernote : Sublime Text 2 plugin for Evernote" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>SublimeEvernote by jamiesun</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
-
-    <title>SublimeEvernote</title>
   </head>
-
   <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/jamiesun/SublimeEvernote">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/jamiesun/SublimeEvernote/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/jamiesun/SublimeEvernote/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/jamiesun/SublimeEvernote">View on GitHub</a>
+    <div class="wrapper">
 
-          <h1 id="project_title">SublimeEvernote</h1>
-          <h2 id="project_tagline">Sublime Text 2 plugin for Evernote</h2>
+      <section>
+        <div id="title">
+          <h1>SublimeEvernote</h1>
+          <p>Sublime Text 2 plugin for Evernote</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/jamiesun">jamiesun</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
 
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/jamiesun/SublimeEvernote/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/jamiesun/SublimeEvernote/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
+        <h1>
+<a id="sublimeevernote" class="anchor" href="#sublimeevernote" aria-hidden="true"><span class="octicon octicon-link"></span></a>SublimeEvernote</h1>
 
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <h1>SublimeEvernote</h1>
+<p><a href="http://www.sublimetext.com/2">Sublime Text 2</a> plugin for <a href="http://www.evernote.com">Evernote</a> </p>
 
-<p><a href="http://www.sublimetext.com/2">Sublime Text 2</a> plugin for create note to <a href="http://www.evernote.com">Evernote</a> </p>
-
-<h3>Install</h3>
+<h3>
+<a id="install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h3>
 
 <p>Through <a href="http://wbond.net/sublime_packages/package_control">Package Control</a></p>
 
 <p><code>Command Palette</code> &gt; <code>Package Control: Install Package</code> &gt; <code>SublimeEvernote</code></p>
 
-<hr><p>or</p>
+<p>or</p>
 
-<p><code>Command Palette</code> &gt; <code>Package Control: add Repository</code> &amp;&amp; input '<a href="http://github.com/jamiesun/SublimeEvernote">http://github.com/jamiesun/SublimeEvernote</a>'</p>
+<p><code>Command Palette</code> &gt; <code>Package Control: add Repository</code> &amp;&amp; <code>input 'http://github.com/jamiesun/SublimeEvernote</code></p>
 
 <p><code>Command Palette</code> &gt; <code>Package Control: Install Package</code> &gt; <code>SublimeEvernote</code></p>
 
-<hr><p>or clone this repository in</p>
+<p>or clone this repository in</p>
 
 <ul>
 <li>Windows: <code>%APPDATA%/Roaming/Sublime Text 2/Packages/</code>
@@ -58,22 +67,75 @@
 </li>
 <li>Portable Installation: <code>Sublime Text 2/Data/</code>
 </li>
-</ul><h3>Usage</h3>
+</ul>
+
+<h3>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <p><code>Command Palette</code> &gt; <code>Send to evernote</code></p>
 
-<p><code>Context menu</code> &gt; <code>Send to evernote</code></p>
+<p><code>Context menu</code> &gt; <code>Send to Evernote</code></p>
+
+<p><code>Context menu</code> &gt; <code>Evernote settings</code></p>
+
+<h4>
+<a id="markdown-support" class="anchor" href="#markdown-support" aria-hidden="true"><span class="octicon octicon-link"></span></a>Markdown Support</h4>
+
+<p>Write notes in Markdown and they will be processed when they are sent to Evernote.</p>
+
+<p>This:
+<img src="https://dl.dropbox.com/u/643062/SublimeEvernoteScreenshots/Markdown.png" alt="this"></p>
+
+<p>Turns into this:
+<img src="https://dl.dropbox.com/u/643062/SublimeEvernoteScreenshots/Evernote.png" alt="this"></p>
+
+<h4>
+<a id="authenticating-with-evernote" class="anchor" href="#authenticating-with-evernote" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authenticating with Evernote</h4>
+
+<p>In order to send notes you need to authenticate and allow the plugin permissions via Evernote's oauth. 
+This is a bit of a manual process now as there are no callbacks to Sublime to handle this process automatically.
+Here are a collection of screenshots to step you through the process.</p>
+
+<h5>
+<a id="step-1---sublime-text2-open-your-browseryou-need-login" class="anchor" href="#step-1---sublime-text2-open-your-browseryou-need-login" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 1 - Sublime text2 open your browser,you need login:</h5>
+
+<p><img src="https://raw.githubusercontent.com/jamiesun/SublimeEvernote/master/snapshot/login.png" alt="login"></p>
+
+<h5>
+<a id="step-2---authorize-plugin-with-evernote" class="anchor" href="#step-2---authorize-plugin-with-evernote" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 2 - Authorize plugin with Evernote:</h5>
+
+<p><img src="https://raw.%20githubusercontent.com/dencold/static/master/images/sublimeevernote/2_authorize.png" alt="authorize"></p>
+
+<h5>
+<a id="step-3---copy-oauth-verifier" class="anchor" href="#step-3---copy-oauth-verifier" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 3 - Copy oauth verifier</h5>
+
+<p><img src="https://raw.githubusercontent.com/dencold/static/master/images/sublimeevernote/3_redirect.png" alt="redirect">
+<img src="https://raw.githubusercontent.com/dencold/static/master/images/sublimeevernote/4_oauth_verifier.png" alt="verifier"></p>
+
+<h5>
+<a id="step-4---verify-token-on-sublime" class="anchor" href="#step-4---verify-token-on-sublime" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 4 - Verify token on Sublime</h5>
+
+<p><img src="https://raw.githubusercontent.com/dencold/static/master/images/sublimeevernote/5_verify_sublime.png" alt="redirect"></p>
+
+<h5>
+<a id="step-5---rejoice" class="anchor" href="#step-5---rejoice" aria-hidden="true"><span class="octicon octicon-link"></span></a>Step 5 - Rejoice!</h5>
+
+<p><img src="https://raw.githubusercontent.com/dencold/static/master/images/sublimeevernote/6_rejoice.png" alt="redirect"></p>
+
+<h4>
+<a id="metadata" class="anchor" href="#metadata" aria-hidden="true"><span class="octicon octicon-link"></span></a>Metadata</h4>
+
+<p>Use metadata block to specify title and tags.</p>
+
+<pre><code>---
+title: My Note
+tags: tag1,tag2
+---
+</code></pre>
       </section>
-    </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">SublimeEvernote maintained by <a href="https://github.com/jamiesun">jamiesun</a></p>
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
-      </footer>
     </div>
-
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
               <script type="text/javascript">
             var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
             document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
@@ -84,7 +146,6 @@
             pageTracker._trackPageview();
             } catch(err) {}
           </script>
-
 
   </body>
 </html>
